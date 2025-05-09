@@ -3,6 +3,10 @@ from ..models.frontier import PriorityQueueFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
 
+# función heurística 'manhattan'
+# Suma de las diferencias absolutas entre las coordenadas del nodo actual
+def manhattan(pos1: tuple[int, int], pos2: tuple[int, int]) -> int:
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 class AStarSearch:
     @staticmethod
@@ -15,13 +19,26 @@ class AStarSearch:
         Returns:
             Solution: Solution found
         """
-        # Initialize a node with the initial position
-        node = Node("", grid.start, 0)
+        start = grid.start
+        goal = grid.end
+        node = Node("", start, 0)
 
-        # Initialize the explored dictionary to be empty
-        explored = {} 
-        
-        # Add the node to the explored dictionary
-        explored[node.state] = True
-        
+        frontier = PriorityQueueFrontier()
+        frontier.add(node, priority=manhattan(start, goal))
+        explored = {start: 0}
+
+        while not frontier.is_empty():
+            node = frontier.pop()
+
+            if node.state == goal:
+                return Solution(node, explored)
+
+            for action, pos in grid.get_neighbours(node.state).items():
+                g = node.cost + grid.get_cost(pos)
+                if pos not in explored or g < explored[pos]:
+                    explored[pos] = g
+                    f = g + manhattan(pos, goal)
+                    child = Node(action, pos, g, parent=node)
+                    frontier.add(child, priority=f)
+
         return NoSolution(explored)

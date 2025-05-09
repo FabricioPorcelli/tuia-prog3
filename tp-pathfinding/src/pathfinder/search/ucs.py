@@ -19,7 +19,7 @@ class UniformCostSearch:
         node = Node("", grid.start, 0, parent=None, action=None)
 
         # Initialize the frontier with the initial node
-        # In this example, the frontier is a queue
+        # In this example, the frontier is a priority queue
         frontier = PriorityQueueFrontier()
         frontier.add(node, node.cost)
 
